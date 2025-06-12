@@ -1,0 +1,16 @@
+{
+  "name": "chatapplication",
+  "version": "1.0.0",
+  "description": "chat where people can create room, invite other people to their room and chat together",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc -b && node ./dist/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/ws": "^8.18.1",
+    "typescript": "^5.8.3",
+    "ws": "^8.18.2"
+  }
+}
