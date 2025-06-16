@@ -11,12 +11,13 @@ wss.on("connection", (socket)=>{
     console.log('user connected #' + userCount );
 
     socket.on("message",(message)=>{
-
-        const parsedMessage = JSON.parse(message as unknown as string);
+        // @ts-ignore
+        const parsedMessage = JSON.parse(message);
         if(parsedMessage.type === "join"){
             const roomId : String = parsedMessage.payload.roomId;
             let exists : boolean = false;
             if(allSockets.has(roomId)) exists = true;
+            console.log("joining a room")
             if(exists){
                 allSockets.get(roomId)?.push(socket);
             }
@@ -29,7 +30,7 @@ wss.on("connection", (socket)=>{
             const socketsToBroadcast: WebSocket[] = allSockets.get(currentRoom) || [];
             if(socketsToBroadcast.length == 0 || !socketsToBroadcast.includes(socket)){
                 // need to decide the flow of 
-                return
+                return 
             }
                 
             
