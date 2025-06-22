@@ -4,6 +4,7 @@ const ws_1 = require("ws");
 const wss = new ws_1.WebSocketServer({ port: 8080 });
 let userCount = 0;
 let allSockets = new Map();
+let socketRooms = new Map();
 wss.on("connection", (socket) => {
     userCount += 1;
     console.log('user connected #' + userCount);
@@ -11,19 +12,19 @@ wss.on("connection", (socket) => {
         var _a;
         // @ts-ignore
         const parsedMessage = JSON.parse(message);
-        console.log(parsedMessage);
-        console.log(parsedMessage.type);
         if (parsedMessage.type === "join") {
             const roomId = parsedMessage.payload.roomId;
             let exists = false;
             if (allSockets.has(roomId))
                 exists = true;
-            console.log("joining a web socket connection");
+            console.log("joining a room");
             if (exists) {
                 (_a = allSockets.get(roomId)) === null || _a === void 0 ? void 0 : _a.push(socket);
+                socketRooms.set(socket, roomId);
             }
             else {
                 allSockets.set(roomId, [socket]);
+                socketRooms.set(socket, roomId);
             }
         }
         if (parsedMessage.type === "message") {
@@ -38,7 +39,19 @@ wss.on("connection", (socket) => {
             }
         }
     });
-    socket.on("disconnect", (socket) => {
+    socket.on("close", () => {
         console.log("disconnected !");
+        // @ts-ignore
+        const roomId = socketRooms.get(socket);
+        socketRooms.delete(socket);
+        const webSocketsInRoom = allSockets.get(roomId);
+        const index = webSocketsInRoom.indexOf(socket);
+        webSocketsInRoom.splice(index, 1);
+        allSockets.set(roomId, webSocketsInRoom);
+        if (webSocketsInRoom.length === 0) {
+            allSockets.delete(roomId);
+        }
+        console.log(allSockets);
+        console.log(socketRooms);
     });
 });
