@@ -38,7 +38,13 @@ wss.on("connection", (socket)=>{
                 
             
             for(let sameRoomSocket of  socketsToBroadcast){
-                sameRoomSocket.send(parsedMessage.payload.message);
+                sameRoomSocket.send(JSON.stringify({
+                    type : "message",
+                    payload : {
+                        message : parsedMessage.payload.message,
+                        numberOfParticipants : socketsToBroadcast.length
+                    }
+                }));
             }
         }
 

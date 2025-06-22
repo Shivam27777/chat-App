@@ -35,12 +35,17 @@ wss.on("connection", (socket) => {
                 return;
             }
             for (let sameRoomSocket of socketsToBroadcast) {
-                sameRoomSocket.send(parsedMessage.payload.message);
+                sameRoomSocket.send(JSON.stringify({
+                    type: "message",
+                    payload: {
+                        message: parsedMessage.payload.message,
+                        numberOfParticipants: socketsToBroadcast.length
+                    }
+                }));
             }
         }
     });
     socket.on("close", () => {
-        console.log("disconnected !");
         // @ts-ignore
         const roomId = socketRooms.get(socket);
         socketRooms.delete(socket);
@@ -51,7 +56,6 @@ wss.on("connection", (socket) => {
         if (webSocketsInRoom.length === 0) {
             allSockets.delete(roomId);
         }
-        console.log(allSockets);
-        console.log(socketRooms);
+        console.log("disconnected !");
     });
 });
